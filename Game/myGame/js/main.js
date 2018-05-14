@@ -389,7 +389,7 @@ checkKeyInput = function()
     	if(passed)
     	{
     		console.log('passed');
-    		light += 10;
+    		light += 7;
     		if(light > 50)
     		{
     			light = 50;
