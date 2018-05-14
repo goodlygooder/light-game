@@ -207,6 +207,10 @@ GamePlay.prototype = {
     	var letter;
     	var num = game.rnd.integerInRange(1,2);
     	var message = '';
+    	for(var i = 0; i < keysPressed.length; i++)
+    	{
+    		currentPrompt[i] = false;
+    	}
     	for(var j = 0; j < num; j++)
     	{
     		letter = game.rnd.integerInRange(0,24);
@@ -225,10 +229,7 @@ GamePlay.prototype = {
 	    			}
 	    			
 	    		}
-	    		else
-	    		{
-	    			currentPrompt[i] = false;
-	    		}
+	    		
     		}
     	}
     	console.log(message);
