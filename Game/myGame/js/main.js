@@ -7,6 +7,8 @@ var nameLabel;
 var instructions;
 var light;
 var lightLevel;
+var hole;
+var timeMultiplier;
 var keysPressed = [false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false];
@@ -50,9 +52,6 @@ Menu.prototype = {
         openLighter = game.add.audio('openLighter');
         strike = game.add.audio('strike');
         theme = game.add.audio('theme');
-
-        
-
 
     },
 
@@ -110,6 +109,7 @@ GamePlay.prototype = {
         game.load.image('background2', 'assets/img/background2.png');
         game.load.image('background3', 'assets/img/background3.png');
         game.load.image('background4', 'assets/img/background4.png');//farthest tree
+        game.load.image('hole', 'assets/img/hole1.png'); //light hole around player
     },
 
     create: function() {
@@ -123,12 +123,17 @@ GamePlay.prototype = {
        		flipFlop = false;
        		//yet another timer. This one loops to keep prompting for keyboard presses
        		promptTimer = game.time.create(false);
-       		promptTimer.loop(Phaser.Timer.SECOND * 5, this.newPrompt, this);
+       		promptTimer.add(Phaser.Timer.SECOND * 5, this.newPrompt, this);
        		promptTimer.start();
+
+       		timeMult = game.time.create(false);
+       		timeMult.loop(Phaser.Timer.SECOND * 5, function timeAdvance(){ if(timeMultiplier < 2) {timeMultiplier += .05;}}, this);
+       		timeMult.start();
 
        		lightTimer = game.time.create(false);
        		lightTimer.loop(Phaser.Timer.SECOND, this.lowerLight, this);
        		lightTimer.start();
+
        		console.log('promptTimer start');
             //Gameplay text
 
@@ -140,11 +145,13 @@ GamePlay.prototype = {
             background3 = game.add.tileSprite(0, -50, 800, 600, 'background3');
             background2 = game.add.tileSprite(0, -50, 800, 600, 'background2');
             background1 = game.add.tileSprite(0, -50, 800, 600, 'background1');
-            player = game.add.sprite(100, 320, 'player');
+            player = game.add.sprite(350, 320, 'player');
             player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+            hole = game.add.sprite(0, 0, 'hole');
             nameLabel = game.add.text(100, 100, '',{font: '50px Courier', fill: '#ffffff'});
             instructions = game.add.text(400, 200, 'Press keys when prompted',{font: '25px Courier', fill: '#ffffff'});
             light = 50;
+            timeMultiplier = 1;
             lightLevel = game.add.text(100,175, 'Light: ' + light, {font: '20px Courier', fill: '#ffffff'} );
             theme.loopFull();
 
@@ -205,7 +212,7 @@ GamePlay.prototype = {
     	console.log('new prompt');
     	passed = false;
     	var letter;
-    	var num = game.rnd.integerInRange(1,2);
+    	var num = game.rnd.integerInRange(1, 2 * timeMultiplier);
     	var message = '';
     	for(var i = 0; i < keysPressed.length; i++)
     	{
@@ -232,6 +239,13 @@ GamePlay.prototype = {
 	    		
     		}
     	}
+
+    	
+
+    	promptTimer = game.time.create(false);
+       	promptTimer.add(Phaser.Timer.SECOND * 5 / timeMultiplier, this.newPrompt, this);
+       	promptTimer.start();
+
     	console.log(message);
     	nameLabel.text = message;
     	
