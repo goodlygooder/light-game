@@ -8,7 +8,6 @@ var instructions;
 var light;
 var lightLevel;
 var hole;
-var timeMultiplier;
 var keysPressed = [false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false];
@@ -123,17 +122,12 @@ GamePlay.prototype = {
        		flipFlop = false;
        		//yet another timer. This one loops to keep prompting for keyboard presses
        		promptTimer = game.time.create(false);
-       		promptTimer.add(Phaser.Timer.SECOND * 5, this.newPrompt, this);
+       		promptTimer.loop(Phaser.Timer.SECOND * 5, this.newPrompt, this);
        		promptTimer.start();
-
-       		timeMult = game.time.create(false);
-       		timeMult.loop(Phaser.Timer.SECOND * 5, function timeAdvance(){ if(timeMultiplier < 2) {timeMultiplier += .05;}}, this);
-       		timeMult.start();
 
        		lightTimer = game.time.create(false);
        		lightTimer.loop(Phaser.Timer.SECOND, this.lowerLight, this);
        		lightTimer.start();
-
        		console.log('promptTimer start');
             //Gameplay text
 
@@ -151,7 +145,6 @@ GamePlay.prototype = {
             nameLabel = game.add.text(100, 100, '',{font: '50px Courier', fill: '#ffffff'});
             instructions = game.add.text(400, 200, 'Press keys when prompted',{font: '25px Courier', fill: '#ffffff'});
             light = 50;
-            timeMultiplier = 1;
             lightLevel = game.add.text(100,175, 'Light: ' + light, {font: '20px Courier', fill: '#ffffff'} );
             theme.loopFull();
 
@@ -212,7 +205,7 @@ GamePlay.prototype = {
     	console.log('new prompt');
     	passed = false;
     	var letter;
-    	var num = game.rnd.integerInRange(1, 2 * timeMultiplier);
+    	var num = game.rnd.integerInRange(1,2);
     	var message = '';
     	for(var i = 0; i < keysPressed.length; i++)
     	{
@@ -239,13 +232,6 @@ GamePlay.prototype = {
 	    		
     		}
     	}
-
-    	
-
-    	promptTimer = game.time.create(false);
-       	promptTimer.add(Phaser.Timer.SECOND * 5 / timeMultiplier, this.newPrompt, this);
-       	promptTimer.start();
-
     	console.log(message);
     	nameLabel.text = message;
     	
