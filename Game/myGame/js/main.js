@@ -1,25 +1,26 @@
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO); //make game
 var flipFlop = true; //global variable that's just used as a toggle
-var lighter;
-var player;
-var nameLabel;
-var instructions;
-var light;
-var lightLevel;
-var hole;
-var timeMultiplier;
+//var lighter;
+//var player;
+//var hand;
+//var nameLabel;
+//var instructions;
+//var light;
+//var lightLevel;
+//var hole;
+//var timeMultiplier;
 var keysPressed = [false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false];
 
-var currentPrompt= [false, false, false, false, false, false, false, false, false, false, 
+var currentPrompt = [false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false];
-var passed = false;
+//var passed = false;
 
-var openLighter;
-var strike;
+//var openLighter;
+//var strike;
 var theme;
 
 
@@ -27,7 +28,7 @@ var Menu = function(game) {};
 Menu.prototype = {
     preload: function() {
         console.log("Menu: preload");
-        game.load.atlas('lighter', 'assets/img/lighterAnimation.png', 'assets/img/lighterAnimation.json');
+        game.load.atlas('lighter', 'assets/img/lighter.png', 'assets/img/lighter.json');
         game.load.audio('theme', ['assets/audio/417993__magmusas__creepy-bell-music-1.mp3', 'assets/audio/417993__magmusas__creepy-bell-music-1.ogg'] );
         //https://freesound.org/people/ABStudios/sounds/177157/ changed by cutting out sections as needed
 		game.load.audio('openLighter', ['assets/audio/lighterOpen.mp3', 'assets/audio/lighterOpen.ogg'] );
@@ -43,11 +44,11 @@ Menu.prototype = {
         timedEvent = qTimer.add(Phaser.Timer.SECOND * 5, this.timerEnd, this);
         qTimer.start();
 
-        game.add.text(100, 100, 'Menu',{font: '50px Courier', fill: '#ffffff'});
+        //game.add.text(100, 100, 'Menu',{font: '50px Courier', fill: '#ffffff'});
         lighter = game.add.sprite(300, 150, 'lighter');
-        lighter.animations.add('idle', ['lighter.png'], 1, true);
-        lighter.animations.add('fire', ['lighter1.png', 'lighter2.png'], 5, true);
-        game.add.text(500, 400, 'Hold q',{font: '50px Courier', fill: '#ffffff'});
+        lighter.animations.add('idle', ['lighter0.png'], 1, true);
+        lighter.animations.add('fire', ['lighter1.png', 'lighter2.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png'], 5, true);
+        game.add.text(300, 425, 'Hold q',{font: '50px Courier', fill: '#ffffff'});
 
         openLighter = game.add.audio('openLighter');
         strike = game.add.audio('strike');
@@ -79,7 +80,7 @@ Menu.prototype = {
         //if q is pressed, initiate the fire
         if(game.input.keyboard.isDown(Phaser.Keyboard.Q) == true){
             lighter.animations.play('fire');
-            game.add.text(200, 500, 'Never let go of q',{font: '50px Courier', fill: '#ffffff'});
+            game.add.text(150, 500, 'Never let go of q',{font: '50px Courier', fill: '#ffffff'});
             
         }
         else{
@@ -103,6 +104,7 @@ GamePlay.prototype = {
      preload: function() {
         console.log("GamePlay: preload");
         game.load.atlas('player', 'assets/img/walk.png', 'assets/img/walk.json');
+        game.load.atlas('hand', 'assets/img/creepyHands1.png', 'assets/img/creepyHands1.json' );
         game.load.image('background', 'assets/img/background.png'); //blue background
         game.load.image('background0', 'assets/img/background0.png');//ground
         game.load.image('background1', 'assets/img/background1.png');//closest tree
@@ -134,6 +136,13 @@ GamePlay.prototype = {
        		lightTimer.loop(Phaser.Timer.SECOND, this.lowerLight, this);
        		lightTimer.start();
 
+       		handSpawn = game.time.create(false);
+       		handSpawn.loop(Phaser.Timer.SECOND * 5, this.handSpawn, this);
+       		handSpawn.start();
+
+       		
+
+
        		console.log('promptTimer start');
             //Gameplay text
 
@@ -145,16 +154,26 @@ GamePlay.prototype = {
             background3 = game.add.tileSprite(0, -50, 800, 600, 'background3');
             background2 = game.add.tileSprite(0, -50, 800, 600, 'background2');
             background1 = game.add.tileSprite(0, -50, 800, 600, 'background1');
+
             player = game.add.sprite(350, 320, 'player');
+            game.physics.arcade.enable(player);
+            //player.anchor.setTo(.5, .5);
             player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+
+            //hands = game.add.group();
+            //game.physics.arcade.enable(hands);
+
+            
+
             hole = game.add.sprite(0, 0, 'hole');
             nameLabel = game.add.text(100, 100, '',{font: '50px Courier', fill: '#ffffff'});
             instructions = game.add.text(400, 200, 'Press keys when prompted',{font: '25px Courier', fill: '#ffffff'});
             light = 50;
             timeMultiplier = 1;
+            passed = false;
             lightLevel = game.add.text(100,175, 'Light: ' + light, {font: '20px Courier', fill: '#ffffff'} );
             theme.loopFull();
-
+            player.animations.play('walk');
 
     },
 
@@ -176,15 +195,20 @@ GamePlay.prototype = {
     	{
     		checkKeyInput();
     	}
+
+    	//game.physics.arcade.overlap(player, hands, this.handCatch, null, this);
     	
     	
         //move character
-        player.animations.play('walk');
+        
+        //hand.animations.play('creep');
 
         background1.tilePosition.x -= 1.25;
         background2.tilePosition.x -= 1;
         background3.tilePosition.x -= 0.75;
         background4.tilePosition.x -= 0.5;
+        //game.debug.body(player);
+        //game.debug.body(hands);
     },
 
     leewayEnd:  function()
@@ -197,6 +221,40 @@ GamePlay.prototype = {
     {
     	light -= 1;
     	lightLevel.text = 'Light: ' + light;
+    },
+
+    handSpawn: function()
+    {
+    	hand = game.add.sprite(game.rnd.integerInRange(-800,1600), -200, 'hand');
+        hand.animations.add('creep', ['creepyHands1.0.png', 'creepyHands1.1.png', 'creepyHands1.2.png'], 4, true);
+        hand.animations.play('creep');
+        game.physics.arcade.enable(hand);
+        hand.anchor.setTo(.1, .5);
+        hand.rotation = game.physics.arcade.angleToXY(hand, 350 + player.width * .75, 320 + player.height * .75) + Math.PI/2;
+        game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, 5000);
+        hand.inputEnabled = true;
+        hand.events.onInputDown.add(this.handClick, this);
+        //hands.add(hand);
+
+        catchTime = game.time.create(false);
+       	catchTime.add(3500, this.handCatch, this);
+       	catchTime.start();
+        
+        //game.physics.enableBody(hand);
+    },
+
+    handClick: function()
+    {
+    	hand.destroy();
+    	catchTime.destroy();
+    },
+
+    handCatch: function()
+    {
+    	console.log('catch');
+    	hand.destroy();
+    	catchTime.destroy();
+    	light -= 15;
     },
 
 
