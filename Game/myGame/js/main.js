@@ -210,8 +210,8 @@ GamePlay.prototype = {
         background2.tilePosition.x -= 1;
         background3.tilePosition.x -= 0.75;
         background4.tilePosition.x -= 0.5;
-        game.debug.body(player);
-        game.debug.body(hands);
+       // game.debug.body(player);
+       // game.debug.body(hands);
     },
 
     leewayEnd:  function()
@@ -249,8 +249,11 @@ GamePlay.prototype = {
 
     handClick: function()
     {
-    	hand.destroy();
-    	catchTime.destroy();
+    	//hand.destroy();
+    	//catchTime.destroy();
+    	//hand.setVelocity(-hand.body.velocity.x, -hand.body.velocity.y);
+    	hand.body.velocity.x = -hand.body.velocity.x;
+    	hand.body.velocity.y = -hand.body.velocity.y;
     },
 
     handCatch: function()
