@@ -22,6 +22,8 @@ var currentPrompt = [false, false, false, false, false, false, false, false, fal
 //var openLighter;
 //var strike;
 var theme;
+var hands;
+var hand;
 
 
 var Menu = function(game) {};
@@ -160,8 +162,9 @@ GamePlay.prototype = {
             //player.anchor.setTo(.5, .5);
             player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
 
-            //hands = game.add.group();
+            hands = game.add.group();
             //game.physics.arcade.enable(hands);
+            hands.enableBody = true;
 
             
 
@@ -196,7 +199,7 @@ GamePlay.prototype = {
     		checkKeyInput();
     	}
 
-    	//game.physics.arcade.overlap(player, hands, this.handCatch, null, this);
+    	game.physics.arcade.overlap(player, hands, this.handCatch, null, this);
     	
     	
         //move character
@@ -207,8 +210,8 @@ GamePlay.prototype = {
         background2.tilePosition.x -= 1;
         background3.tilePosition.x -= 0.75;
         background4.tilePosition.x -= 0.5;
-        //game.debug.body(player);
-        //game.debug.body(hands);
+        game.debug.body(player);
+        game.debug.body(hands);
     },
 
     leewayEnd:  function()
@@ -225,20 +228,21 @@ GamePlay.prototype = {
 
     handSpawn: function()
     {
-    	hand = game.add.sprite(game.rnd.integerInRange(-800,1600), -200, 'hand');
+    	hand = hands.create(game.rnd.integerInRange(-800,1600), -200, 'hand');
         hand.animations.add('creep', ['creepyHands1.0.png', 'creepyHands1.1.png', 'creepyHands1.2.png'], 4, true);
         hand.animations.play('creep');
         game.physics.arcade.enable(hand);
-        hand.anchor.setTo(.1, .5);
+        hand.body.setSize(100,100, 0, 200);
+        hand.anchor.setTo(.5, .5);
         hand.rotation = game.physics.arcade.angleToXY(hand, 350 + player.width * .75, 320 + player.height * .75) + Math.PI/2;
         game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, 5000);
         hand.inputEnabled = true;
         hand.events.onInputDown.add(this.handClick, this);
         //hands.add(hand);
 
-        catchTime = game.time.create(false);
-       	catchTime.add(3500, this.handCatch, this);
-       	catchTime.start();
+        // catchTime = game.time.create(false);
+       	// catchTime.add(3500, this.handCatch, this);
+       	// catchTime.start();
         
         //game.physics.enableBody(hand);
     },
@@ -253,8 +257,9 @@ GamePlay.prototype = {
     {
     	console.log('catch');
     	hand.destroy();
-    	catchTime.destroy();
+    	// catchTime.destroy();
     	light -= 15;
+    	lightLevel.text = 'Light: ' + light;
     },
 
 
