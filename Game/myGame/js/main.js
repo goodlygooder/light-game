@@ -254,6 +254,7 @@ GamePlay.prototype = {
     	//hand.setVelocity(-hand.body.velocity.x, -hand.body.velocity.y);
     	hand.body.velocity.x = -hand.body.velocity.x;
     	hand.body.velocity.y = -hand.body.velocity.y;
+    	hand.inputEnabled = false;
     },
 
     handCatch: function()
