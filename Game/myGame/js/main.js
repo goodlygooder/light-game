@@ -51,7 +51,7 @@ Menu.prototype = {
         lighter.animations.add('idle', ['lighter0.png'], 1, true);
         lighter.animations.add('fire', ['lighter1.png', 'lighter2.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png'], 5, true);
         //game.add.text(300, 425, 'Hold q',{font: '50px Courier', fill: '#ffffff'});
-        game.add.text(250, 200, 'Q',{font: '50px Courier', fill: '#ffffff'});
+        //game.add.text(250, 200, 'Q',{font: '50px Courier', fill: '#ffffff'});
 
         openLighter = game.add.audio('openLighter');
         strike = game.add.audio('strike');
@@ -117,7 +117,7 @@ Instructions.prototype = {
     create: function() {
         shack = game.add.sprite(0, 0, 'shack1');
         
-        player1 = game.add.sprite(300, 130, 'player1');
+        player1 = game.add.sprite(300, 130, 'player1', 'standingPlayer.png');
         player1.scale.setTo(1.2, 1.2);
         player1.animations.add('walk1', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
         game.physics.enable([player1], Phaser.Physics.ARCADE);
