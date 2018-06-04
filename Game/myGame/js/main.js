@@ -1,15 +1,16 @@
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO); //make game
 var flipFlop = true; //global variable that's just used as a toggle
-//var lighter;
-//var player;
-//var hand;
-//var nameLabel;
-//var instructions;
-//var light;
-//var lightLevel;
-//var hole;
-//var timeMultiplier;
+var lighter;
+var player;
+var walking;
+var hand;
+var nameLabel;
+var instructions;
+var light;
+var lightLevel;
+var hole;
+var timeMultiplier;
 var keysPressed = [false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false, false, false, false, false, false, 
 					false, false, false, false, false];
@@ -24,6 +25,11 @@ var currentPrompt = [false, false, false, false, false, false, false, false, fal
 var theme;
 var hands;
 var hand;
+
+var forest1 = false;
+var forest2 = false;
+var shack = false;
+var house = false;
 
 
 var Menu = function(game) {};
@@ -43,7 +49,7 @@ Menu.prototype = {
         game.scale.pageAlignHorizontally = true;
         //start a timer
         qTimer = game.time.create(false);
-        timedEvent = qTimer.add(Phaser.Timer.SECOND * 5, this.timerEnd, this);
+        timedEvent = qTimer.add(Phaser.Timer.SECOND * 3, this.timerEnd, this);
         qTimer.start();
 
         //game.add.text(100, 100, 'Menu',{font: '50px Courier', fill: '#ffffff'});
@@ -51,11 +57,16 @@ Menu.prototype = {
         lighter.animations.add('idle', ['lighter0.png'], 1, true);
         lighter.animations.add('fire', ['lighter1.png', 'lighter2.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png','lighter3.png', 'lighter4.png'], 5, true);
         //game.add.text(300, 425, 'Hold q',{font: '50px Courier', fill: '#ffffff'});
-        game.add.text(250, 200, 'Q',{font: '50px Courier', fill: '#ffffff'});
+        //game.add.text(250, 200, 'Q',{font: '50px Courier', fill: '#ffffff'});
 
         openLighter = game.add.audio('openLighter');
         strike = game.add.audio('strike');
-        theme = game.add.audio('theme');
+        if(!forest1)
+        {
+        	theme = game.add.audio('theme');
+        }
+        
+
 
     },
 
@@ -74,7 +85,7 @@ Menu.prototype = {
     	else if(game.input.keyboard.isDown(Phaser.Keyboard.Q) && flipFlop == false)
     	{
     		qTimer = game.time.create(false);
-       		timedEvent = qTimer.add(Phaser.Timer.SECOND * 5, this.timerEnd, this);
+       		timedEvent = qTimer.add(Phaser.Timer.SECOND * 3, this.timerEnd, this);
        		qTimer.start();
        		console.log('start q timer');
        		flipFlop = true;
@@ -98,7 +109,31 @@ Menu.prototype = {
     timerEnd:  function()
     {
     	console.log('q timer finished');
-    	game.state.start('Instructions');
+    	if(!shack)
+    	{
+    		console.log('go to instr')
+    		game.state.start('Instructions');
+    	}
+    	else if(!forest1)
+    	{
+    		console.log('go to forest1')
+    		game.state.start('Outside');
+    	}
+    	else if(!house)
+    	{
+    		console.log('go to house')
+    		game.state.start('House');
+    	}
+    	else if(!forest2)
+    	{
+    		console.log('go to forest2')
+    		game.state.start('Outside')
+    	}
+    	else
+    	{
+    		console.log('go to lake');
+    		game.state.start('Outside');
+    	}
     }
 
 
@@ -130,23 +165,30 @@ Instructions.prototype = {
        	leewayTimer = qTimer.add(Phaser.Timer.SECOND * .25, this.leewayEnd, this);
        	qTimer.start();
        	flipFlop = false;
+
        	console.log('Leeway timer start');
 
        	shack.inputEnabled = true;
        	shack.events.onInputDown.add(this.openDoor, this);
+
+       	helpTimer = game.time.create(false);
+       	helpTimer.add(Phaser.Timer.SECOND * 15,function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.start();
 
 
         //player1.body.collideWorldBounds=true;
     },
 
     update: function() {
+    	//game.input.keyboard.update();
         if((!game.input.keyboard.isDown(Phaser.Keyboard.Q) && flipFlop))
         {
             theme.stop();
             game.state.start('GameOver');
         }
+        
 
-        game.physics.arcade.overlap(player1, hitBox, function play(){game.state.start('GamePlay');}, null, this);
+        game.physics.arcade.overlap(player1, hitBox, function play(){game.state.start('Outside'); shack = true;}, null, this);
 
     //     if(game.input.keyboard.isDown(Phaser.Keyboard.W)){
     //         player1.animations.play('walk1');
@@ -170,6 +212,7 @@ Instructions.prototype = {
     openDoor: function()
     {
     	shack.loadTexture('shack2', 0);
+    	helpTimer.destroy();
     	player1.body.velocity.x = 100;
     	player1.animations.play('walk1');
 
@@ -177,8 +220,8 @@ Instructions.prototype = {
     },
 }
 
-var GamePlay = function() {};
-GamePlay.prototype = {
+var Outside = function() {};
+Outside.prototype = {
      preload: function() {
         console.log("GamePlay: preload");
         game.load.atlas('player', 'assets/img/walk.png', 'assets/img/walk.json');
@@ -192,6 +235,16 @@ GamePlay.prototype = {
         game.load.image('background2', 'assets/img/background2.png');
         game.load.image('background3', 'assets/img/background3.png');
         game.load.image('background4', 'assets/img/background4.png');//farthest tree
+        game.load.image('forestA', 'assets/img/forestA.png');//closest tree
+        game.load.image('forestB', 'assets/img/forestB.png');
+        game.load.image('forestC', 'assets/img/forestC.png');
+        game.load.image('forestD', 'assets/img/forestD.png');//farthest tree
+        game.load.image('lake','assets/img/lake.png' );
+        game.load.image('waterGround','assets/img/waterGround.png' );
+        game.load.image('lakePlayer','assets/img/lakePlayer.png' );
+
+        game.load.image('gate1', 'assets/img/gate1.png');
+        game.load.image('gate2', 'assets/img/gate2.png');
         
     },
 
@@ -217,10 +270,31 @@ GamePlay.prototype = {
        		lightTimer.loop(Phaser.Timer.SECOND, this.lowerLight, this);
        		lightTimer.start();
 
-       		handSpawn = game.time.create(false);
-       		handSpawn.loop(Phaser.Timer.SECOND * 5, this.handSpawn, this);
-       		handSpawn.start();
-
+       		
+       		if(!forest1)
+       		{
+	       		stateTimer = game.time.create(false);
+	       		stateTimer.add(Phaser.Timer.SECOND * 30, this.spawnGate, this);
+	       		stateTimer.start();
+       		}
+       		else
+       		{
+       			stateTimer = game.time.create(false);
+	       		stateTimer.add(Phaser.Timer.SECOND * 30, this.goToNextState, this);
+	       		stateTimer.start();
+	       		if(!forest2)
+	       		{
+	       			handSpawn = game.time.create(false);
+       				handSpawn.loop(Phaser.Timer.SECOND * 5, this.handSpawn, this);
+       				handSpawn.start();
+	       		}
+       			else
+       			{
+       				handSpawn = game.time.create(false);
+       				handSpawn.loop(Phaser.Timer.SECOND * 3.5, this.handSpawn, this);
+       				handSpawn.start();
+       			}
+       		}
        		
 
 
@@ -230,11 +304,30 @@ GamePlay.prototype = {
            
             //background
             background = game.add.sprite(0, 0, 'background');
-            background0 = game.add.sprite(0, 0, 'background0');
-            background4 = game.add.tileSprite(0, -50, 800, 600, 'background4');
-            background3 = game.add.tileSprite(0, -50, 800, 600, 'background3');
-            background2 = game.add.tileSprite(0, -50, 800, 600, 'background2');
-            background1 = game.add.tileSprite(0, -50, 800, 600, 'background1');
+            
+            if(!forest1)
+            {
+            	background4 = game.add.tileSprite(0, -50, 800, 600, 'background4');
+            	background3 = game.add.tileSprite(0, -50, 800, 600, 'background3');
+            	background2 = game.add.tileSprite(0, -50, 800, 600, 'background2');
+            	background1 = game.add.tileSprite(0, -50, 800, 600, 'background1');
+            	background0 = game.add.sprite(0, 0, 'background0');
+            }
+            else if(!forest2)
+            {
+            	background4 = game.add.tileSprite(0, -50, 8855, 675, 'forestD');
+            	background3 = game.add.tileSprite(0, -50, 8855, 675, 'forestC');
+            	background2 = game.add.tileSprite(0, -50, 8855, 675, 'forestB');
+            	background1 = game.add.tileSprite(0, -50, 8855, 675, 'forestA');
+            	background0 = game.add.sprite(0, 0, 'background0');
+            }
+            else
+            {
+            	lake = game.add.tileSprite(0, -50, 800, 600, 'lake');
+            	background0 = game.add.sprite(0, 0, 'waterGround');
+            }
+            
+            //8855, 675
 
             keys = [game.add.sprite(350,280, 'keys'), game.add.sprite(400,280, 'keys'), game.add.sprite(450,280, 'keys')];
             for(var i = 0; i < keys.length; i ++)
@@ -245,10 +338,19 @@ GamePlay.prototype = {
             }
 
 
-            player = game.add.sprite(350, 320, 'player');
-            game.physics.arcade.enable(player);
+            
             //player.anchor.setTo(.5, .5);
-            player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+            if(!forest2)
+            {
+            	player = game.add.sprite(350, 320, 'player');
+            	player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+            }
+            else
+            {
+            	player = game.add.sprite(350, 320, 'lakePlayer');
+            }
+            game.physics.arcade.enable(player);
+            
 
             hands = game.add.group();
             //game.physics.arcade.enable(hands);
@@ -263,14 +365,36 @@ GamePlay.prototype = {
             ui.add(keys[0]);
             ui.add(keys[1]);
             ui.add(keys[2]);
-            nameLabel = game.add.text(100, 100, '',{font: '50px Courier', fill: '#ffffff'});
-            instructions = game.add.text(400, 200, 'Press keys when prompted',{font: '25px Courier', fill: '#ffffff'});
+
+            if(!forest1)
+            {
+            	instructions = game.add.text(400, 200, 'Press keys when prompted',{font: '25px Courier', fill: '#ffffff'});
+            }
+            else
+            {
+            	instructions = game.add.text(400, 200, '',{font: '25px Courier', fill: '#ffffff'});
+            }
+            
             light = 50;
             timeMultiplier = 1;
             passed = false;
-            lightLevel = game.add.text(100,175, 'Light: ' + light, {font: '20px Courier', fill: '#ffffff'} );
-            theme.loopFull();
+            
+
+            if(!forest1)
+            {
+            	theme.loopFull();
+            }
+            
             player.animations.play('walk');
+
+            playerLayering = game.add.group();
+            playerLayering.add(player);
+
+            scrollBackground = true;
+
+            hitBox = game.add.sprite(700, 200, 'player');
+       		game.physics.enable([hitBox], Phaser.Physics.ARCADE);
+       		hitBox.alpha = 0;
 
     },
 
@@ -283,7 +407,7 @@ GamePlay.prototype = {
 
     	if((!game.input.keyboard.isDown(Phaser.Keyboard.Q) && flipFlop) || light <= 0)
     	{
-    		theme.stop();
+    		
         	game.state.start('GameOver');
     	}
 
@@ -294,22 +418,65 @@ GamePlay.prototype = {
     	}
 
     	game.physics.arcade.overlap(player, hands, this.handCatch, null, this);
-    	this.updateLight();
+    	game.physics.arcade.overlap(player, hitBox, this.leaveForest, null, this);
+
+    	if(player.body.velocity.x == 0)
+    	{
+    		this.updateLight();
+    	}
+    	
     	
     	
         //move character
         
         //hand.animations.play('creep');
-
-        background1.tilePosition.x -= 1.25;
-        background2.tilePosition.x -= 1;
-        background3.tilePosition.x -= 0.75;
-        background4.tilePosition.x -= 0.5;
+        if(scrollBackground)
+        {
+        	if(!forest2)
+        	{
+        		background1.tilePosition.x -= 1.25;
+		        background2.tilePosition.x -= 1;
+		        background3.tilePosition.x -= 0.75;
+		        background4.tilePosition.x -= 0.5;
+        	}
+        	else
+        	{
+        		lake.tilePosition.x -= 1.25
+        	}
+        	
+        }
+        
         hole.sendToBack();
+
 
 
        // game.debug.body(player);
        // game.debug.body(hands);
+    },
+
+    leaveForest: function()
+    {
+    	if(!forest1)
+    	{
+    		forest1 = true;
+    		game.state.start('Menu');
+    	}
+    	
+    	
+    },
+
+    goToNextState: function()
+    {
+    	if(!forest2)
+    	{
+    		forest2 = true;
+    		game.state.start('Menu');
+    	}
+    	else
+    	{
+    		game.state.start('Win');
+    	}
+    	
     },
 
     leewayEnd:  function()
@@ -321,7 +488,7 @@ GamePlay.prototype = {
     lowerLight: function()
     {
     	light -= 1;
-    	lightLevel.text = 'Light: ' + light;
+    	
     },
 
     handSpawn: function()
@@ -343,15 +510,13 @@ GamePlay.prototype = {
         hand.anchor.setTo(.5, .5);
         hand.rotation = game.physics.arcade.angleToXY(hand, 350 + player.width * .75, 320 + player.height * .75) + Math.PI/2;
         game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, 5000);
+        
         hand.inputEnabled = true;
         hand.events.onInputDown.add(this.handClick, this);
     },
 
     handClick: function()
     {
-    	//hand.destroy();
-    	//catchTime.destroy();
-    	//hand.setVelocity(-hand.body.velocity.x, -hand.body.velocity.y);
     	hand.body.velocity.x = -hand.body.velocity.x;
     	hand.body.velocity.y = -hand.body.velocity.y;
     	hand.inputEnabled = false;
@@ -361,14 +526,59 @@ GamePlay.prototype = {
     {
     	console.log('catch');
     	hand.destroy();
-    	// catchTime.destroy();
     	light -= 15;
-    	lightLevel.text = 'Light: ' + light;
+    	
+    },
+
+    spawnGate: function()
+    {
+    	//gate = game.add.sprite(500, 150, 'gate1');  //end location
+    	gate = game.add.sprite(900, 150, 'gate1');
+    	playerLayering.add(gate);
+    	//gate.inputEnabled = true;
+    	game.physics.arcade.enable(gate);
+    	gate.body.velocity.x = -75;
+
+    	gateEnterTimer = game.time.create(false);
+       	gateEnterTimer.add(Phaser.Timer.SECOND * 5, this.gateInPlace, this);
+       	gateEnterTimer.start();
+
+    	gate.events.onInputDown.add(this.openGate, this);
+    },
+
+    gateInPlace: function()
+    {
+    	gate.body.velocity.x = 0;
+    	gate.inputEnabled = true;
+    	player.animations.stop();
+    	scrollBackground = false;
+
+    	helpTimer = game.time.create(false);
+       	helpTimer.add(Phaser.Timer.SECOND * 15, function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.start();
+
+
+    },
+
+    openGate: function()
+    {
+    	gate.inputEnabled = false;
+    	player.animations.play('walk');
+    	player.body.velocity.x = 75;
+    	if(hole.frame < 6)
+    	{
+    		hole.frame = 6;
+    	}
+    	
+    	gate.loadTexture('gate2', 0);
+    	gate.sendToBack();
+
+    	
     },
 
     updateLight: function()
     {
-    	console.log('update Light' + light);
+    	
     	if(light > 45)
     	{
     		hole.frame = 3
@@ -415,12 +625,16 @@ GamePlay.prototype = {
     	{
     		console.log('failed');
     		light -= 10;
-    		lightLevel.text = 'Light: ' + light;
+    		
     	}
     	console.log('new prompt');
     	passed = false;
     	var letter;
     	var num = game.rnd.integerInRange(1, 2 * timeMultiplier);
+    	if(num > 3)
+    	{
+    		num = 3;
+    	}
     	var message = '';
     	for(var i = 0; i < keysPressed.length; i++)
     	{
@@ -466,7 +680,358 @@ GamePlay.prototype = {
        	promptTimer.start();
 
     	console.log(message);
-    	nameLabel.text = message;
+    	
+    	
+    }
+}
+
+var House = function() {};
+House.prototype = {
+     preload: function() {
+        console.log("House: preload");
+        game.load.atlas('player', 'assets/img/walk.png', 'assets/img/walk.json');
+        game.load.atlas('hand1', 'assets/img/creepyHands1.png', 'assets/img/creepyHands1.json' );
+        game.load.atlas('hand2', 'assets/img/creepyHands2.png', 'assets/img/creepyHands2.json' );
+        game.load.atlas('keys', 'assets/img/keys.png', 'assets/img/keys.json' );
+        game.load.atlas('hole', 'assets/img/hole.png', 'assets/img/hole.json'); //light hole around player
+        game.load.image('house', 'assets/img/house.png');
+        game.load.image('openDoor', 'assets/img/openDoor.png');
+        game.load.image('closedDoor', 'assets/img/closedDoor.png');
+        
+    },
+
+    create: function() {
+        console.log("House: create");
+
+        	//start another timer for .5 seconds and set the toggle to false to give the player some starting leeway
+        	qTimer = game.time.create(false);
+       		leewayTimer = qTimer.add(Phaser.Timer.SECOND * .25, this.leewayEnd, this);
+       		qTimer.start();
+       		console.log('Leeway timer start');
+       		flipFlop = false;
+       		//yet another timer. This one loops to keep prompting for keyboard presses
+       		promptTimer = game.time.create(false);
+       		promptTimer.add(Phaser.Timer.SECOND * 5, this.newPrompt, this);
+       		promptTimer.start();
+
+       		timeMult = game.time.create(false);
+       		timeMult.loop(Phaser.Timer.SECOND * 5, function timeAdvance(){ if(timeMultiplier < 1.9) {timeMultiplier += .05;}}, this);
+       		timeMult.start();
+
+       		lightTimer = game.time.create(false);
+       		lightTimer.loop(Phaser.Timer.SECOND, this.lowerLight, this);
+       		lightTimer.start();
+
+       		handSpawn = game.time.create(false);
+       		handSpawn.loop(Phaser.Timer.SECOND * 5, this.handSpawn, this);
+       		handSpawn.start();
+
+       		
+
+       		
+
+
+       		console.log('promptTimer start');
+            //Gameplay text
+
+           
+            //background
+            //6153, 600
+            house = game.add.sprite(0, 0, 'house');
+            game.physics.arcade.enable(house);
+            house.body.velocity.x = -150;
+
+            door = game.add.sprite(5903, 200, 'closedDoor');
+            game.physics.arcade.enable(door);
+            door.body.velocity.x = -150;
+            
+           
+
+            keys = [game.add.sprite(350,280, 'keys'), game.add.sprite(400,280, 'keys'), game.add.sprite(450,280, 'keys')];
+            for(var i = 0; i < keys.length; i ++)
+            {
+            	keys[i].animations.add('display', ['A.png', 'B.png', 'C.png', 'D.png', 'E.png', 'F.png', 'G.png', 'H.png', 'I.png', 'J.png', 'K.png', 'L.png', 'M.png', 'N.png', 'O.png', 'P.png', 'R.png', 'S.png', 'T.png', 'U.png', 'V.png', 'W.png', 'X.png', 'Y.png', 'Z.png'], 5, true);
+            	keys[i].frame = 0;
+            	keys[i].visible = false;
+            }
+
+
+            player = game.add.sprite(350, 320, 'player');
+            game.physics.arcade.enable(player);
+            //player.anchor.setTo(.5, .5);
+            player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+
+            hands = game.add.group();
+            //game.physics.arcade.enable(hands);
+            hands.enableBody = true;
+            atStop = false
+
+            
+
+            hole = game.add.sprite(0, 0, 'hole');
+            hole.animations.add('lightness', ['hole1.png', 'hole2.png', 'hole3.png', 'hole4.png', 'hole5.png', 'hole6.png', 'hole7.png', 'hole8.png', 'hole9.png', 'hole10.png', 'hole11.png', 'hole12.png', 'hole13.png', 'hole14.png', 'hole15.png', 'hole16.png'], 6, true);
+            ui = game.add.group();
+            ui.add(hole);
+            ui.add(keys[0]);
+            ui.add(keys[1]);
+            ui.add(keys[2]);
+
+            
+            light = 50;
+            timeMultiplier = 1;
+            passed = false;
+            
+
+           
+            
+            player.animations.play('walk');
+
+            playerLayering = game.add.group();
+            playerLayering.add(player);
+
+            instructions = game.add.text(400, 175, 'Click hands to dispel them',{font: '25px Courier', fill: '#ffffff'});
+
+            hitBox = game.add.sprite(700, 320, 'player');
+       		game.physics.enable([hitBox], Phaser.Physics.ARCADE);
+       		hitBox.alpha = 0;
+
+    },
+
+    update: function() {
+
+    	//timer is used as a bit of leeway, as phaser seems not to process input for a short period of time
+    	//inbetween states.
+
+    	//when q is not held and the leeway is used up, go to gameover
+
+    	if((!game.input.keyboard.isDown(Phaser.Keyboard.Q) && flipFlop) || light <= 0)
+    	{
+    		
+        	game.state.start('GameOver');
+    	}
+
+    	//console.log(game.input.keyboard.isDown(Phaser.Keyboard.A));
+    	if(!passed)
+    	{
+    		checkKeyInput();
+    	}
+
+    	game.physics.arcade.overlap(player, hands, this.handCatch, null, this);
+    	game.physics.arcade.overlap(player, hitBox, function play(){game.state.start('Menu'); forest1 = true;}, null, this);
+    	if(player.body.velocity.x == 0)
+    	{
+    		this.updateLight();
+    	}
+    	
+    	
+        //move character
+        
+        //hand.animations.play('creep');
+        
+        
+        hole.sendToBack();
+
+        if(house.x <= (-(house.width) + 800) && !atStop)
+        {
+        	house.body.velocity.x = 0;
+        	door.body.velocity.x = 0;
+        	atStop = true;
+        	this.atEnd();
+        }
+
+
+
+
+
+       // game.debug.body(player);
+       // game.debug.body(hands);
+    },
+
+    leewayEnd:  function()
+    {
+    	console.log('Leeway timer end');
+    	flipFlop = true;
+    },
+
+    atEnd: function()
+    {
+    	door.inputEnabled = true;
+    	player.animations.stop();
+       	door.events.onInputDown.add(this.openDoor, this);
+
+       	helpTimer = game.time.create(false);
+       	helpTimer.add(Phaser.Timer.SECOND * 15, function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.start();
+    },
+
+    openDoor: function()
+    {
+    	house.inputEnabled = false;
+    	
+    	player.animations.play('walk');
+    	walking = true;
+    	player.body.velocity.x = 75;
+    	if(hole.frame < 6)
+    	{
+    		hole.frame = 6;
+    	}
+    	
+    	door.loadTexture('openDoor', 0);
+
+    	
+    },
+
+    lowerLight: function()
+    {
+    	light -= 1;
+    	
+    },
+
+    handSpawn: function()
+    {
+    	if(game.rnd.integerInRange(0,1) == 0)
+    	{
+    		hand = hands.create(game.rnd.integerInRange(-800,1600), -200, 'hand1');
+        	hand.animations.add('creep', ['creepyHands1.0.png', 'creepyHands1.1.png', 'creepyHands1.2.png'], 4, true);
+    	}
+    	else
+    	{
+    		hand = hands.create(game.rnd.integerInRange(-800,1600), -200, 'hand2');
+        	hand.animations.add('creep', ['creepyHands2.0.png', 'creepyHands2.1.png', 'creepyHands2.2.png'], 4, true);
+    	}
+    	
+        hand.animations.play('creep');
+        game.physics.arcade.enable(hand);
+        hand.body.setSize(100,100, 0, 200);
+        hand.anchor.setTo(.5, .5);
+        hand.rotation = game.physics.arcade.angleToXY(hand, 350 + player.width * .75, 320 + player.height * .75) + Math.PI/2;
+        game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, 5000);
+        
+        hand.inputEnabled = true;
+        hand.events.onInputDown.add(this.handClick, this);
+    },
+
+    handClick: function()
+    {
+    	hand.body.velocity.x = -hand.body.velocity.x;
+    	hand.body.velocity.y = -hand.body.velocity.y;
+    	hand.inputEnabled = false;
+    },
+
+    handCatch: function()
+    {
+    	console.log('catch');
+    	hand.destroy();
+    	light -= 15;
+    	
+    },
+
+
+    updateLight: function()
+    {
+    	
+    	if(light > 45)
+    	{
+    		hole.frame = 3
+    	}
+    	else if(light > 40)
+    	{
+    		hole.frame = 4;
+    	}
+    	else if(light > 35)
+    	{
+    		hole.frame = 5;
+    	}
+    	else if (light > 30)
+    	{
+    		hole.frame = 6;
+    	}
+    	else if(light > 25)
+    	{
+    		hole.frame = 7;
+    	}
+    	else if(light > 20)
+    	{
+    		hole.frame = 8;
+    	}
+    	else if(light > 15)
+    	{
+    		hole.frame = 9;
+    	}
+    	else if(light > 10)
+    	{
+    		hole.frame = 10;
+    	}
+    	else
+    	{
+    		hole.frame = 11;
+    	}
+    },
+
+
+    newPrompt: function()
+    {
+    	instructions.text = '';
+    	if(!passed)
+    	{
+    		console.log('failed');
+    		light -= 10;
+    		
+    	}
+    	console.log('new prompt');
+    	passed = false;
+    	var letter;
+    	var num = game.rnd.integerInRange(1, 2 * timeMultiplier);
+    	if(num > 3)
+    	{
+    		num = 3;
+    	}
+    	var message = '';
+    	for(var i = 0; i < keysPressed.length; i++)
+    	{
+    		currentPrompt[i] = false;
+    	}
+    	for(var j = 0; j < num; j++)
+    	{
+    		letter = game.rnd.integerInRange(0,24);
+    		for(var i = 0; i < currentPrompt.length; i++)
+    		{
+	    		if(letter == i && !currentPrompt[i])
+	    		{
+	    			currentPrompt[i] = true;
+	    			if(letter < 16)
+	    			{
+	    				message += String.fromCharCode(i + 97);
+	    			}
+	    			else if(letter >= 16)
+	    			{
+	    				message += String.fromCharCode(i + 98);
+	    			}
+	    			keys[j].frame = i;
+	    			keys[j].visible = true
+	    		}
+	    		
+    		}
+
+    	}
+    	if(num < 3)
+    	{
+    		keys[2].visible = false;
+    	}
+    	if(num < 2)
+    	{
+    		keys[1].visible = false;
+    	}
+    	
+
+    	
+
+    	promptTimer = game.time.create(false);
+       	promptTimer.add(Phaser.Timer.SECOND * 5 / timeMultiplier, this.newPrompt, this);
+       	promptTimer.start();
+
+    	console.log(message);
+    	
     	
     }
 }
@@ -481,8 +1046,43 @@ GameOver.prototype = {
     create: function() {
         console.log("GameOver: create");
         //Gameover text
-        var nameLabel = game.add.text(280, 250, 'Gameover',{font: '50px Courier', fill: '#ffffff'});
+        theme.stop();
+        var nameLabel = game.add.text(280, 250, 'GameOver',{font: '50px Courier', fill: '#ffffff'});
         game.add.text(160, 300, 'Press r to restart',{font: '50px Courier', fill: '#ffffff'});
+
+        forest1 = false;
+        forest2 = false;
+        shack  = false;
+        house = false;
+ 
+    },
+
+    update: function() {
+        if(game.input.keyboard.isDown(Phaser.Keyboard.R)){
+            game.state.start('Menu');
+        }
+        
+    }
+}
+
+var Win = function(game) {}; //unchanged
+Win.prototype = {
+     preload: function() {
+        console.log("Win: preload");
+        game.load.image('end', 'assets/img/end.png');
+    },
+
+    create: function() {
+        console.log("Win: create");
+        //Gameover text
+        theme.stop();
+        game.add.sprite(0, 0, 'end');
+       
+
+        forest1 = false;
+        forest2 = false;
+        shack  = false;
+        house = false;
  
     },
 
@@ -627,10 +1227,10 @@ checkKeyInput = function()
     		{
     			light = 50;
     		}
-    		lightLevel.text = 'Light: ' + light;
+    		
     		if(wasPrompt)
     		{
-    			nameLabel.text = 'passed';
+    			
     			for(var i = 0; i < keys.length; i++)
     			{
     				keys[i].visible = false;
@@ -645,6 +1245,8 @@ checkKeyInput = function()
 //standard states
 game.state.add('Menu', Menu);
 game.state.add('Instructions', Instructions);
-game.state.add('GamePlay', GamePlay);
+game.state.add('Outside', Outside);
+game.state.add('House', House);
+game.state.add('Win', Win);
 game.state.add('GameOver', GameOver);
 game.state.start('Menu');
