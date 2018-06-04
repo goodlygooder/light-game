@@ -257,6 +257,7 @@ Outside.prototype = {
        		qTimer.start();
        		console.log('Leeway timer start');
        		flipFlop = false;
+       		handCatchLeeway = false;
        		//yet another timer. This one loops to keep prompting for keyboard presses
        		promptTimer = game.time.create(false);
        		promptTimer.add(Phaser.Timer.SECOND * 5, this.newPrompt, this);
@@ -503,13 +504,22 @@ Outside.prototype = {
     		hand = hands.create(game.rnd.integerInRange(-800,1600), -200, 'hand2');
         	hand.animations.add('creep', ['creepyHands2.0.png', 'creepyHands2.1.png', 'creepyHands2.2.png'], 4, true);
     	}
-    	
+
+    	if(!forest2)
+    	{
+    		var handApproachTime = 5000;
+    	}
+    	else
+    	{
+    		var handApproachTime = 3500;
+    	}
+
         hand.animations.play('creep');
         game.physics.arcade.enable(hand);
         hand.body.setSize(100,100, 0, 200);
         hand.anchor.setTo(.5, .5);
         hand.rotation = game.physics.arcade.angleToXY(hand, 350 + player.width * .75, 320 + player.height * .75) + Math.PI/2;
-        game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, 5000);
+        game.physics.arcade.moveToXY(hand, 350 + player.width * .75, 320 + player.height * .75, 5, handApproachTime);
         
         hand.inputEnabled = true;
         hand.events.onInputDown.add(this.handClick, this);
@@ -526,7 +536,16 @@ Outside.prototype = {
     {
     	console.log('catch');
     	hand.destroy();
-    	light -= 15;
+    	if(!handCatchLeeway)
+    	{
+    		light -= 15;
+    	}
+    	handCatchLeeway = true;
+    	
+
+    	handLeeway = game.time.create(false);
+       	handLeeway.loop(Phaser.Timer.SECOND * .5, function resetLeeway(){handCatchLeeway = false;} , this);
+       	handSpawn.start();
     	
     },
 
@@ -1040,15 +1059,15 @@ var GameOver = function(game) {}; //unchanged
 GameOver.prototype = {
      preload: function() {
         console.log("GameOver: preload");
-
+        game.load.image('gameoverScreen','assets/img/Game-Over-screen.png' );
     },
 
     create: function() {
         console.log("GameOver: create");
+        game.add.sprite(0, 0, 'gameoverScreen');
         //Gameover text
         theme.stop();
-        var nameLabel = game.add.text(280, 250, 'GameOver',{font: '50px Courier', fill: '#ffffff'});
-        game.add.text(160, 300, 'Press r to restart',{font: '50px Courier', fill: '#ffffff'});
+        
 
         forest1 = false;
         forest2 = false;
