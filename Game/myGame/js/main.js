@@ -69,6 +69,21 @@ Menu.prototype = {
         	theme = game.add.audio('theme');
         	drone = game.add.audio('drone');
         }
+
+        
+        else if(!house)
+        {
+        	game.add.text(275, 450, 'The House',{font: '50px Courier', fill: '#ffffff'});
+        }
+        else if(!forest2)
+        {
+        	game.add.text(275, 450, 'The Grove',{font: '50px Courier', fill: '#ffffff'});
+        }
+        else
+        {
+        	game.add.text(275, 450, 'The Lake',{font: '50px Courier', fill: '#ffffff'});
+        }
+        
         
 
 
@@ -100,7 +115,7 @@ Menu.prototype = {
         //if q is pressed, initiate the fire
         if(game.input.keyboard.isDown(Phaser.Keyboard.Q) == true){
             lighter.animations.play('fire');
-            //game.add.text(150, 500, 'Never let go of q',{font: '50px Courier', fill: '#ffffff'});
+            
             
         }
         else{
@@ -150,15 +165,15 @@ Instructions.prototype = {
         game.load.atlas('player1', 'assets/img/walk.png', 'assets/img/walk.json');
         game.load.image('shack1', 'assets/img/shack.png');
         game.load.image('shack2', 'assets/img/shack-open.png');
-        //game.load.image('standing', 'assets/img/standingPlayer.png');
+        game.load.image('standing', 'assets/img/standingPlayer.png');
     },
 
     create: function() {
         shack = game.add.sprite(0, 0, 'shack1');
         
-        player1 = game.add.sprite(300, 130, 'player1');
+        player1 = game.add.sprite(300, 130, 'standing');
         player1.scale.setTo(1.2, 1.2);
-        player1.animations.add('walk1', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
+        
         game.physics.enable([player1], Phaser.Physics.ARCADE);
 
         hitBox = game.add.sprite(700, 130, 'player1');
@@ -219,6 +234,8 @@ Instructions.prototype = {
     	shack.loadTexture('shack2', 0);
     	helpTimer.destroy();
     	player1.body.velocity.x = 100;
+    	player1.loadTexture('player1');
+    	player1.animations.add('walk1', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
     	player1.animations.play('walk1');
 
 
@@ -776,13 +793,13 @@ House.prototype = {
             game.physics.arcade.enable(house);
             house.body.velocity.x = -100;
 
-            door = game.add.sprite(5903, 200, 'closedDoor');
+            door = game.add.sprite(5883, 180, 'closedDoor');
             game.physics.arcade.enable(door);
-            door.body.velocity.x = -150;
+            door.body.velocity.x = -100;
             
            
 
-            keys = [game.add.sprite(350,280, 'keys'), game.add.sprite(400,280, 'keys'), game.add.sprite(450,280, 'keys')];
+            keys = [game.add.sprite(350,240, 'keys'), game.add.sprite(400,240, 'keys'), game.add.sprite(450,240, 'keys')];
             for(var i = 0; i < keys.length; i ++)
             {
             	keys[i].animations.add('display', ['A.png', 'B.png', 'C.png', 'D.png', 'E.png', 'F.png', 'G.png', 'H.png', 'I.png', 'J.png', 'K.png', 'L.png', 'M.png', 'N.png', 'O.png', 'P.png', 'R.png', 'S.png', 'T.png', 'U.png', 'V.png', 'W.png', 'X.png', 'Y.png', 'Z.png'], 5, true);
@@ -791,8 +808,9 @@ House.prototype = {
             }
 
 
-            player = game.add.sprite(350, 320, 'player');
+            player = game.add.sprite(350, 270, 'player');
             game.physics.arcade.enable(player);
+            player.scale.setTo(1.2, 1.2);
             //player.anchor.setTo(.5, .5);
             player.animations.add('walk', ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png'], 6, true);
 
@@ -1155,8 +1173,8 @@ Win.prototype = {
         player.animations.play('crouch');
 
 
-        titleText = game.add.text(400, -500, 'The Light',{font: '25px Courier', fill: '#ffffff'});
-        textChange = false;
+        titleText = game.add.text(400, -300, 'The Light',{font: '25px Courier', fill: '#ffffff'});
+        textChange = 0;
        
 
         forest1 = false;
@@ -1176,18 +1194,18 @@ Win.prototype = {
         {
         	titleText.y += 1;
         }
-        else if(!textChange && titleText.alpha > 0)
+        else if(textChange == 0 && titleText.alpha > 0)
         {
         	titleText.alpha-= .01;
         }
 
-        if(titleText.alpha <= 0 && !textChange)
+        if(titleText.alpha <= 0 && textChange == 0)
         {
         	titleText.text = 'R to restart';
-        	textChange = true
+        	textChange = 1;
         }
 
-        if(textChange && titleText.alpha < 1)
+        if(textChange == 1 && titleText.alpha < 1)
         {
         	titleText.alpha += .01;
         }
