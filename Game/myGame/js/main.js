@@ -73,15 +73,15 @@ Menu.prototype = {
         
         else if(!house)
         {
-        	game.add.text(275, 450, 'The House',{font: '50px Courier', fill: '#ffffff'});
+        	game.add.text(300, 410, 'The House',{font: '35px Courier', fill: '#ffffff'});
         }
         else if(!forest2)
         {
-        	game.add.text(275, 450, 'The Grove',{font: '50px Courier', fill: '#ffffff'});
+        	game.add.text(300, 410, 'The Grove',{font: '35px Courier', fill: '#ffffff'});
         }
         else
         {
-        	game.add.text(275, 450, 'The Lake',{font: '50px Courier', fill: '#ffffff'});
+        	game.add.text(310, 410, 'The Lake',{font: '35px Courier', fill: '#ffffff'});
         }
         
         
@@ -251,6 +251,7 @@ Outside.prototype = {
         game.load.atlas('hand2', 'assets/img/creepyHands2.png', 'assets/img/creepyHands2.json' );
         game.load.atlas('keys', 'assets/img/keys.png', 'assets/img/keys.json' );
         game.load.atlas('hole', 'assets/img/hole.png', 'assets/img/hole.json'); //light hole around player
+        game.load.atlas('lakePlayer','assets/img/lakePlayer.png', 'assets/img/lakePlayer.json');
 
         game.load.image('background', 'assets/img/background.png'); //blue background
         game.load.image('background0', 'assets/img/background0.png');//ground
@@ -264,10 +265,8 @@ Outside.prototype = {
         game.load.image('forestD', 'assets/img/forestD.png');//farthest tree
         game.load.image('lake','assets/img/lake.png' );
         game.load.image('waterGround','assets/img/waterGround.png' );
-        game.load.image('lakePlayer','assets/img/lakePlayer.png' );
         game.load.image('gate1', 'assets/img/gate1.png');
         game.load.image('gate2', 'assets/img/gate2.png');
-
         game.load.audio('splash', ['assets/audio/Splish splash.mp3', 'assets/audio/Splish splash.ogg'] );
 
         
@@ -376,6 +375,7 @@ Outside.prototype = {
             else
             {
             	player = game.add.sprite(350, 320, 'lakePlayer');
+            	player.animations.add('walk', ['lakePlayer1.png', 'lakePlayer2.png', 'lakePlayer3.png', 'lakePlayer2.png'], 6, true);
             }
             game.physics.arcade.enable(player);
             
@@ -799,7 +799,7 @@ House.prototype = {
             
            
 
-            keys = [game.add.sprite(350,240, 'keys'), game.add.sprite(400,240, 'keys'), game.add.sprite(450,240, 'keys')];
+            keys = [game.add.sprite(350,220, 'keys'), game.add.sprite(400,220, 'keys'), game.add.sprite(450,220, 'keys')];
             for(var i = 0; i < keys.length; i ++)
             {
             	keys[i].animations.add('display', ['A.png', 'B.png', 'C.png', 'D.png', 'E.png', 'F.png', 'G.png', 'H.png', 'I.png', 'J.png', 'K.png', 'L.png', 'M.png', 'N.png', 'O.png', 'P.png', 'R.png', 'S.png', 'T.png', 'U.png', 'V.png', 'W.png', 'X.png', 'Y.png', 'Z.png'], 5, true);
