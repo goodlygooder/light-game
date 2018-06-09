@@ -191,7 +191,7 @@ Instructions.prototype = {
        	shack.events.onInputDown.add(this.openDoor, this);
 
        	helpTimer = game.time.create(false);
-       	helpTimer.add(Phaser.Timer.SECOND * 15,function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.add(Phaser.Timer.SECOND * 5,function help(){instructions = game.add.text(275, 90, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
        	helpTimer.start();
 
 
@@ -231,6 +231,7 @@ Instructions.prototype = {
 
     openDoor: function()
     {
+        //instructions.destroy();
     	shack.loadTexture('shack2', 0);
     	helpTimer.destroy();
     	player1.body.velocity.x = 100;
@@ -603,7 +604,7 @@ Outside.prototype = {
     	scrollBackground = false;
 
     	helpTimer = game.time.create(false);
-       	helpTimer.add(Phaser.Timer.SECOND * 15, function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.add(Phaser.Timer.SECOND * 5, function help(){instructions = game.add.text(375, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
        	helpTimer.start();
 
 
@@ -611,6 +612,7 @@ Outside.prototype = {
 
     openGate: function()
     {
+        //instructions.destroy();
     	gate.inputEnabled = false;
     	player.animations.play('walk');
     	player.body.velocity.x = 75;
@@ -913,12 +915,13 @@ House.prototype = {
        	door.events.onInputDown.add(this.openDoor, this);
 
        	helpTimer = game.time.create(false);
-       	helpTimer.add(Phaser.Timer.SECOND * 15, function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
+       	helpTimer.add(Phaser.Timer.SECOND * 5, function help(){instructions = game.add.text(400, 200, 'Click Door',{font: '25px Courier', fill: '#ffffff'});}, this);
        	helpTimer.start();
     },
 
     openDoor: function()
     {
+        instructions.destroy();
     	house.inputEnabled = false;
     	
     	player.animations.play('walk');
