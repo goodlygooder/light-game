@@ -363,6 +363,7 @@ Outside.prototype = {
             	keys[i].animations.add('display', ['A.png', 'B.png', 'C.png', 'D.png', 'E.png', 'F.png', 'G.png', 'H.png', 'I.png', 'J.png', 'K.png', 'L.png', 'M.png', 'N.png', 'O.png', 'P.png', 'R.png', 'S.png', 'T.png', 'U.png', 'V.png', 'W.png', 'X.png', 'Y.png', 'Z.png'], 5, true);
             	keys[i].frame = 0;
             	keys[i].visible = false;
+            	game.physics.enable([keys[i]], Phaser.Physics.ARCADE);
             }
 
 
@@ -616,6 +617,10 @@ Outside.prototype = {
     	gate.inputEnabled = false;
     	player.animations.play('walk');
     	player.body.velocity.x = 75;
+    	keys[0].body.velocity.x = 75;
+    	keys[1].body.velocity.x = 75;
+    	keys[2].body.velocity.x = 75;
+
     	if(hole.frame > 6)
     	{
     		hole.frame = 6;
@@ -807,6 +812,7 @@ House.prototype = {
             	keys[i].animations.add('display', ['A.png', 'B.png', 'C.png', 'D.png', 'E.png', 'F.png', 'G.png', 'H.png', 'I.png', 'J.png', 'K.png', 'L.png', 'M.png', 'N.png', 'O.png', 'P.png', 'R.png', 'S.png', 'T.png', 'U.png', 'V.png', 'W.png', 'X.png', 'Y.png', 'Z.png'], 5, true);
             	keys[i].frame = 0;
             	keys[i].visible = false;
+            	game.physics.arcade.enable(keys[i]);
             }
 
 
@@ -927,6 +933,9 @@ House.prototype = {
     	player.animations.play('walk');
     	walking = true;
     	player.body.velocity.x = 75;
+    	keys[0].body.velocity.x = 75;
+    	keys[1].body.velocity.x = 75;
+    	keys[2].body.velocity.x = 75;
     	if(hole.frame > 6)
     	{
     		hole.frame = 6;
